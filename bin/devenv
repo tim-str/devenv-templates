@@ -95,6 +95,13 @@ cmd_new() {
   read -rp "Git repo URL: " git_repo
   [[ -n "$git_repo" ]] || die "git repo URL required"
 
+  read -rp "Branch (leave empty for default): " git_branch
+  if [[ -n "$git_branch" ]]; then
+    # verify branch exists on remote
+    git ls-remote --exit-code --heads "$git_repo" "$git_branch" &>/dev/null \
+      || die "branch '$git_branch' not found on remote"
+  fi
+
   local port
   port=$(next_free_port)
 
@@ -119,6 +126,7 @@ cmd_new() {
     sed \
       -e "s|{{PROJECT_NAME}}|$project|g" \
       -e "s|{{GIT_REPO}}|$git_repo|g" \
+      -e "s|{{GIT_BRANCH}}|$git_branch|g" \
       -e "s|{{SSH_PORT}}|$port|g" \
       -e "s|{{SSH_PUBKEY}}|$pubkey|g" \
       -e "s|{{PROJECT_DIR}}|$project_dir|g" \
@@ -130,6 +138,7 @@ cmd_new() {
   cat > "$proj_cfg" <<EOF
 PROJECT_NAME=$project
 GIT_REPO=$git_repo
+GIT_BRANCH=$git_branch
 SSH_PORT=$port
 TEMPLATE=$template
 WORKSPACE=$workspace

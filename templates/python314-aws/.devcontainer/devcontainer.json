@@ -19,9 +19,10 @@
   "appPort": ["{{SSH_PORT}}:22"],
   "remoteUser": "vscode",
   "workspaceFolder": "/workspace",
-  "postStartCommand": "sudo ssh-keygen -A && sudo /usr/sbin/sshd && git config --global credential.helper '!f() { echo username=git; echo password=$GIT_TOKEN; }; f' && git config --global user.email \"$GIT_USER_EMAIL\" && git config --global user.name \"$GIT_USER_NAME\" && [ -z \"$(ls -A /workspace)\" ] && git clone \"https://${GIT_TOKEN}@$(echo $GIT_REPO | sed 's|https://||')\" /workspace || true",
+  "postStartCommand": "sudo ssh-keygen -A && sudo /usr/sbin/sshd && git config --global credential.helper '!f() { echo username=git; echo password=$GIT_TOKEN; }; f' && git config --global user.email \"$GIT_USER_EMAIL\" && git config --global user.name \"$GIT_USER_NAME\" && [ -z \"$(ls -A /workspace)\" ] && git clone ${GIT_BRANCH:+--branch $GIT_BRANCH} \"https://${GIT_TOKEN}@$(echo $GIT_REPO | sed 's|https://||')\" /workspace || true",
   "remoteEnv": {
     "GIT_REPO": "{{GIT_REPO}}",
+    "GIT_BRANCH": "{{GIT_BRANCH}}",
     "GIT_TOKEN": "${localEnv:GIT_TOKEN}",
     "GIT_USER_EMAIL": "${localEnv:GIT_USER_EMAIL}",
     "GIT_USER_NAME": "${localEnv:GIT_USER_NAME}"
