@@ -97,8 +97,10 @@ cmd_new() {
 
   read -rp "Branch (leave empty for default): " git_branch
   if [[ -n "$git_branch" ]]; then
-    # verify branch exists on remote
-    git ls-remote --exit-code --heads "$git_repo" "$git_branch" &>/dev/null \
+    # verify branch exists on remote using token-authenticated URL
+    local auth_repo
+    auth_repo="https://${GIT_TOKEN}@$(echo "$git_repo" | sed 's|https://||')"
+    git ls-remote --exit-code --heads "$auth_repo" "$git_branch" &>/dev/null \
       || die "branch '$git_branch' not found on remote"
   fi
 
