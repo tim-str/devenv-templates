@@ -23,6 +23,9 @@
   "workspaceFolder": "/workspace",
   "postCreateCommand": "git config --global credential.helper '!f() { echo username=git; echo password=$GIT_TOKEN; }; f' && git config --global user.email \"$GIT_USER_EMAIL\" && git config --global user.name \"$GIT_USER_NAME\"; if [ -z \"$(ls -A /workspace)\" ]; then git clone ${GIT_BRANCH:+--branch $GIT_BRANCH} \"https://${GIT_TOKEN}@$(echo $GIT_REPO | sed 's|https://||')\" /workspace; fi; cd /workspace && { if [ -f pyproject.toml ]; then uv sync; elif [ -f requirements.txt ]; then uv venv && uv pip install -r requirements.txt; fi; } || echo 'devenv: dependency install failed — run uv sync in /workspace to see the error'",
   "postStartCommand": "sudo ssh-keygen -A && sudo /usr/sbin/sshd",
+  "containerEnv": {
+    "UV_LINK_MODE": "copy"
+  },
   "remoteEnv": {
     "GIT_REPO": "{{GIT_REPO}}",
     "GIT_BRANCH": "{{GIT_BRANCH}}",
