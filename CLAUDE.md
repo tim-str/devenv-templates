@@ -28,6 +28,7 @@ Personal dev environment manager for macOS. Manages isolated devcontainers per p
 - **Bind mount** — `~/projects/<project>` on host maps to `/workspace` in container; survives rebuilds
 - **SSH access** — public key baked in at build time via Docker `ARG SSH_PUBKEY`; sshd started via `postStartCommand`
 - **`postStartCommand`** handles all init — sshd, git credentials, initial clone — because `devcontainer` overrides the image ENTRYPOINT
+  - **Exception — `django-bff` template** splits the lifecycle the way the spec intends: `postCreateCommand` provisions the codebase + deps (git config → clone → `uv sync`, so `/workspace/.venv` is built from `uv.lock`), while `postStartCommand` only boots sshd. Because `devenv stop` does `docker rm`, each `start` recreates the container and re-runs `postCreateCommand`, reconciling deps to the lockfile. Dep install is non-fatal (won't block sshd) and only fires once a `pyproject.toml`/`uv.lock` (or `requirements.txt`) exists in the repo.
 - **Host env vars** injected via `${localEnv:VAR}` in `devcontainer.json` — `GIT_TOKEN`, `GIT_USER_EMAIL`, `GIT_USER_NAME` must be set on host
 
 ## Required host env vars
