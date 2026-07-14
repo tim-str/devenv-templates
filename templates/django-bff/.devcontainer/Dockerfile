@@ -30,4 +30,8 @@ RUN echo "vscode ALL=(root) NOPASSWD: /usr/sbin/sshd, /usr/bin/ssh-keygen" >> /e
 RUN curl -LsSf https://astral.sh/uv/install.sh | \
     env UV_INSTALL_DIR=/usr/local/bin INSTALLER_NO_MODIFY_PATH=1 sh
 
+# Auto-activate the project venv on interactive shells. Guarded so it's a no-op
+# until `uv sync` has created /workspace/.venv — lets SSH sessions use bare `python`.
+RUN printf '\n# devenv: auto-activate project venv\nif [ -f /workspace/.venv/bin/activate ]; then . /workspace/.venv/bin/activate; fi\n' >> /home/vscode/.bashrc
+
 EXPOSE 22
